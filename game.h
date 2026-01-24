@@ -5,18 +5,23 @@
 struct Tile {
     int x;
     int y;
+    bool flagged = false;
+    bool revealed = false;
+
+    int state = 0; // 0-8 = adjacent bombs & 9 = bomb
 };
 
 
 class Game {
 public:
-    Game(unsigned width, unsigned height);
+    Game(unsigned width, unsigned height, unsigned bombAmount);
     void run();
 
 private:
     void handleEvents();
-    void update();
     void render();
+    void placeBombs(int bombs);
+    void calculateAdjacency();
 
     sf::RenderWindow window;
 

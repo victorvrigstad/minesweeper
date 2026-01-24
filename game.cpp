@@ -1,7 +1,7 @@
 #include "game.h"
 #include <iostream>
 
-Game::Game(unsigned width, unsigned height)
+Game::Game(unsigned width, unsigned height, unsigned bombAmount)
     : window(sf::VideoMode(width, height), "Test") {
     gridWidth  = width  / TILE_SIZE;
     gridHeight = height / TILE_SIZE;
@@ -15,8 +15,15 @@ Game::Game(unsigned width, unsigned height)
             tiles.push_back(Tile{x, y});
         }
     }
-    window.setFramerateLimit(60);
+
+    //placeBombs(bombAmount); //TODO
+    //calculateAdjacency();
+
+    window.setFramerateLimit(60); //without this, 100% gpu and fps over 9000 
 }
+
+
+
 
 void Game::run() {
     while (window.isOpen()) {
