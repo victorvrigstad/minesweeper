@@ -1,29 +1,11 @@
 #include "game.h"
 #include <iostream>
 
-Game::Game(unsigned width, unsigned height, unsigned bombAmount)
-    : window(sf::VideoMode(width, height), "Test") {
-    gridWidth  = width  / TILE_SIZE;
-    gridHeight = height / TILE_SIZE;
-
-    if (!tileTexture.loadFromFile("images/51230.png")) {
-        throw std::runtime_error("Failed to load texture");
-    }
-
-    for (int y = 0; y < gridHeight; y++){
-        for (int x = 0; x < gridWidth; x++){
-            tiles.push_back(Tile{x, y});
-        }
-    }
-
-    //placeBombs(bombAmount); //TODO
-    //calculateAdjacency();
-
-    window.setFramerateLimit(60); //without this, 100% gpu and fps over 9000 
+Game::Game(unsigned width, unsigned height)
+    : window(sf::VideoMode(width, height), "Test"),
+    board(width/TILE_SIZE, height/TILE_SIZE, DEFAULT_BOMBS) {
+        window.setFramerateLimit(FPS); //without this, 100% gpu and fps over 9000 
 }
-
-
-
 
 void Game::run() {
     while (window.isOpen()) {
@@ -49,11 +31,5 @@ void Game::handleEvents() {
 }
 
 void Game::render() {
-    sf::Sprite sprite;
-    sprite.setTexture(tileTexture);
-    sprite.setScale(TILE_SIZE / sprite.getLocalBounds().width, TILE_SIZE / sprite.getLocalBounds().height);
-    for (Tile tile : tiles) {
-        sprite.setPosition(tile.x*TILE_SIZE, tile.y*TILE_SIZE);
-        window.draw(sprite);
-    }
+   board.render(window);
 }
