@@ -30,22 +30,22 @@ void Board::revealTile(unsigned x, unsigned y) {
             t.revealed = true;
             // up
             if (y < height - 1) {
-                if (tileAt(x, y + 1).state == 0)
+                if (tileAt(x, y + 1).state < 9)
                     revealTile(x, y + 1);
             }
             // down
             if (y > 0) {
-                if (tileAt(x, y - 1).state == 0)
+                if (tileAt(x, y - 1).state < 9)
                     revealTile(x, y - 1);
             }
             // right
             if (x < width - 1) {
-                if (tileAt(x + 1, y).state == 0)
+                if (tileAt(x + 1, y).state < 9)
                     revealTile(x + 1, y);
             }
             // left
             if (x > 0) {
-                if (tileAt(x - 1, y).state == 0)
+                if (tileAt(x - 1, y).state < 9)
                     revealTile(x - 1, y);
             }
         }
@@ -56,6 +56,9 @@ void Board::revealTile(unsigned x, unsigned y) {
         }
         if (t.state == 9) {
             // TODO fix game over
+            /*while (1 == 1) {
+                std::cout << "YOU LOSE NOOB ";
+            }*/
            t.currState = t.state;
            t.revealed = true;
         }
