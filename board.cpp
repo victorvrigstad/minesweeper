@@ -1,10 +1,16 @@
 #include "board.h"
+#include <iostream>
+#include <random>
 
 Board::Board(unsigned width, unsigned height, unsigned bombCount)
     : width(width), height(height), bombCount(bombCount) {
 
-    if (!tileTexture.loadFromFile("images/51230.png"))
-        throw std::runtime_error("Failed to load texture");
+    for (int i = 0; i <= 11; i++) {
+        if (!tileTexture.loadFromFile("images/tile" + std::to_string(i) + ".png"))
+            throw std::runtime_error("Failed to load texture");
+
+        textures.push_back(tileTexture);
+    }
 
     for (unsigned y = 0; y < height; y++){
         for (unsigned x = 0; x < width; x++){
@@ -12,15 +18,108 @@ Board::Board(unsigned width, unsigned height, unsigned bombCount)
         }
     }
 
-    //placeBombs(bombAmount); //TODO
-    //calculateAdjacency();
+    placeBombs(bombCount, width, height); 
+    calculateAdjacency();
+}
+
+void Board::revealTile(unsigned x, unsigned y) {
+    auto& t = tileAt(x, y);
+    if (!t.revealed && t.currState != 11) {
+        if (t.state == 0) {
+            t.currState = 10;
+            t.revealed = true;
+            // up
+            if (y < height - 1) {
+                if (tileAt(x, y + 1).state == 0)
+                    revealTile(x, y + 1);
+            }
+            // down
+            if (y > 0) {
+                if (tileAt(x, y - 1).state == 0)
+                    revealTile(x, y - 1);
+            }
+            // right
+            if (x < width - 1) {
+                if (tileAt(x + 1, y).state == 0)
+                    revealTile(x + 1, y);
+            }
+            // left
+            if (x > 0) {
+                if (tileAt(x - 1, y).state == 0)
+                    revealTile(x - 1, y);
+            }
+        }
+        if (t.state > 0 &&t.state < 9)
+        {
+            t.currState = t.state;
+            t.revealed = true;
+        }
+        if (t.state == 9) {
+            // TODO fix game over
+           t.currState = t.state;
+           t.revealed = true;
+        }
+    }
+}
+
+void Board::placeFlag(unsigned x, unsigned y) {
+    auto& t = tileAt(x, y);
+    if (t.currState == 11) {
+        t.currState = 0;
+    }
+    else if (t.currState == 0) {
+        t.currState = 11;
+    }
+
+}
+
+void Board::placeBombs(unsigned bombCount, unsigned width, unsigned height) {
+    static std::mt19937 rng(std::random_device{}());
+
+    std::uniform_int_distribution<unsigned> xDist(0, width - 1);
+    std::uniform_int_distribution<unsigned> yDist(0, height - 1);
+    
+    for (unsigned i = 0; i < bombCount; i++) {
+        unsigned x = xDist(rng);
+        unsigned y = yDist(rng);
+        
+        tileAt(x, y).state = 9;
+    }
+}
+
+Tile& Board::tileAt(unsigned x, unsigned y) {
+    return tiles[y * width + x];
+}
+
+void Board::calculateAdjacency() {
+    for (const auto& tile : tiles) {
+        if (tile.state != 9)
+            continue;
+            
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                if (dx ==  0 && dy == 0)
+                    continue;
+
+                int tx = tile.x + dx;
+                int ty = tile.y + dy;
+
+                if (tx < 0 || tx >= (int)width || ty < 0 || ty >= (int)height)
+                    continue;
+                
+                auto& t = tileAt(tx, ty);
+                if (t.state != 9)
+                    t.state++;
+            }
+        }
+    }
 }
 
 void Board::render(sf::RenderWindow& window) {
     sf::Sprite sprite;
-    sprite.setTexture(tileTexture);
-    sprite.setScale(TILE_SIZE / sprite.getLocalBounds().width, TILE_SIZE / sprite.getLocalBounds().height);
     for (Tile tile : tiles) {
+        sprite.setTexture(textures[tile.currState]);
+        sprite.setScale(TILE_SIZE / sprite.getLocalBounds().width, TILE_SIZE / sprite.getLocalBounds().height);
         sprite.setPosition(tile.x*TILE_SIZE, tile.y*TILE_SIZE);
         window.draw(sprite);
     }
