@@ -25,16 +25,12 @@ void Game::handleEvents() {
         if (event.type == sf::Event::MouseButtonPressed &&
             event.mouseButton.button == sf::Mouse::Left) {
                 auto m = sf::Mouse::getPosition(window);
-                // TODO fix this poo
-                //std::cout << m.x/25 << ":" << (600 - m.y)/25 << std::endl;
-                board.revealTile(m.x/25, m.y/25);
+                board.revealTile(m.x/TILE_SIZE, m.y/TILE_SIZE);
             }
         if (event.type == sf::Event::MouseButtonPressed &&
             event.mouseButton.button == sf::Mouse::Right)  {
                 auto m = sf::Mouse::getPosition(window);
-                // TODO fix this poo
-                //std::cout << m.x/25 << ":" << (600 - m.y)/25 << std::endl;
-                board.placeFlag(m.x/25, m.y/25);
+                board.placeFlag(m.x/TILE_SIZE, m.y/TILE_SIZE);
             }
     }
 }
