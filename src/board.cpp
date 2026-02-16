@@ -26,25 +26,27 @@ void Board::revealTile(unsigned x, unsigned y) {
         if (t.state == 0) {
             t.currState = 10;
             t.revealed = true;
-            // up
-            if (y < height - 1) {
-                if (tileAt(x, y + 1).state < 9)
-                    revealTile(x, y + 1);
-            }
-            // down
-            if (y > 0) {
-                if (tileAt(x, y - 1).state < 9)
-                    revealTile(x, y - 1);
-            }
-            // right
-            if (x < width - 1) {
-                if (tileAt(x + 1, y).state < 9)
-                    revealTile(x + 1, y);
-            }
-            // left
-            if (x > 0) {
-                if (tileAt(x - 1, y).state < 9)
-                    revealTile(x - 1, y);
+
+            for (int dy = -1; dy <= 1; ++dy) {
+                for (int dx = -1; dx <= 1; ++dx) {
+                    if (dx == 0 && dy == 0) {
+                        continue;
+                    }
+
+                    int nx = static_cast<int>(x) + dx;
+                    int ny = static_cast<int>(y) + dy;
+
+                    if (nx < 0 || ny < 0 ||
+                        nx >= static_cast<int>(width) ||
+                        ny >= static_cast<int>(height)) {
+                        continue;
+                    }
+
+                    auto& n = tileAt(static_cast<unsigned>(nx), static_cast<unsigned>(ny));
+                    if (n.state < 9) {
+                        revealTile(static_cast<unsigned>(nx), static_cast<unsigned>(ny));
+                    }
+                }
             }
         }
         if (t.state > 0 &&t.state < 9)
@@ -87,23 +89,28 @@ Tile& Board::tileAt(unsigned x, unsigned y) {
 
 void Board::calculateAdjacency() {
     for (const auto& tile : tiles) {
-        if (tile.state != 9)
+        if (tile.state != 9) {
             continue;
-            
+        }
+
         for (int dy = -1; dy <= 1; dy++) {
             for (int dx = -1; dx <= 1; dx++) {
-                if (dx ==  0 && dy == 0)
+                if (dx == 0 && dy == 0) {
                     continue;
+                }
 
-                int tx = tile.x + dx;
-                int ty = tile.y + dy;
+                int tx = static_cast<int>(tile.x) + dx;
+                int ty = static_cast<int>(tile.y) + dy;
 
-                if (tx < 0 || tx >= (int)width || ty < 0 || ty >= (int)height)
+                if (tx < 0 || tx >= static_cast<int>(width) ||
+                    ty < 0 || ty >= static_cast<int>(height)) {
                     continue;
-                
-                auto& t = tileAt(tx, ty);
-                if (t.state != 9)
+                }
+
+                auto& t = tileAt(static_cast<unsigned>(tx), static_cast<unsigned>(ty));
+                if (t.state != 9) {
                     t.state++;
+                }
             }
         }
     }
