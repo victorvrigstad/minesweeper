@@ -129,13 +129,20 @@ void Board::render(sf::RenderWindow& window) {
 }
 
 void Board::handleEvents(const sf::Event& event) {
-    if (event.type == sf::Event::MouseButtonPressed &&
-        event.mouseButton.button == sf::Mouse::Left) {
-        revealTile(event.mouseButton.x / TILE_SIZE, event.mouseButton.y / TILE_SIZE);
+    if (event.type != sf::Event::MouseButtonPressed) {
+        return;
     }
 
-    if (event.type == sf::Event::MouseButtonPressed &&
-        event.mouseButton.button == sf::Mouse::Right) {
-        placeFlag(event.mouseButton.x / TILE_SIZE, event.mouseButton.y / TILE_SIZE);    
+    unsigned tx = static_cast<unsigned>(event.mouseButton.x / TILE_SIZE);
+    unsigned ty = static_cast<unsigned>(event.mouseButton.y / TILE_SIZE);
+
+    if (tx >= width || ty >= height) {
+        return;
+    }
+
+    if (event.mouseButton.button == sf::Mouse::Left) {
+        revealTile(tx, ty);
+    } else if (event.mouseButton.button == sf::Mouse::Right) {
+        placeFlag(tx, ty);
     }
 }
