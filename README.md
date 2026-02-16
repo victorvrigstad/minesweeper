@@ -1,6 +1,11 @@
-# Minesweeper (SFML, C++)
+# Minesweeper + Pathfinding Visualizer (SFML, C++)
 
-Simple Minesweeper game built in C++ with SFML.
+Combined C++/SFML project with:
+
+- A Minesweeper game mode
+- A pathfinding board visualization mode
+
+The pathfinding mode is currently focused on board generation and obstacle visualization, with search algorithms WIP.
 
 ## Important version note
 
@@ -53,6 +58,11 @@ mingw32-make clean
 mingw32-make
 mingw32-make run
 ```
+
+## Modes
+
+- `Minesweeper`: select difficulty from menu buttons.
+- `Pathfinding visualizer`: press `P` from menu to open a generated obstacle board.
 
 ## Optional PowerShell alias
 
