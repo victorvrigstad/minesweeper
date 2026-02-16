@@ -1,12 +1,11 @@
 #include "board.h"
-#include <iostream>
 #include <random>
 
 Board::Board(unsigned width, unsigned height, unsigned bombCount)
     : width(width), height(height), bombCount(bombCount) {
 
     for (int i = 0; i <= 11; i++) {
-        if (!tileTexture.loadFromFile("images/tile" + std::to_string(i) + ".png"))
+        if (!tileTexture.loadFromFile("resources/images/tile" + std::to_string(i) + ".png"))
             throw std::runtime_error("Failed to load texture");
 
         textures.push_back(tileTexture);
@@ -24,6 +23,7 @@ Board::Board(unsigned width, unsigned height, unsigned bombCount)
 
 void Board::revealTile(unsigned x, unsigned y) {
     auto& t = tileAt(x, y);
+    //std::this_thread::sleep_for(std::chrono::milliseconds(20)); TODO make it so not all tiles are revealed instantly, instead like wave
     if (!t.revealed && t.currState != 11) {
         if (t.state == 0) {
             t.currState = 10;
@@ -120,10 +120,22 @@ void Board::calculateAdjacency() {
 
 void Board::render(sf::RenderWindow& window) {
     sf::Sprite sprite;
-    for (Tile tile : tiles) {
+    for (const auto& tile : tiles) {
         sprite.setTexture(textures[tile.currState]);
         sprite.setScale(TILE_SIZE / sprite.getLocalBounds().width, TILE_SIZE / sprite.getLocalBounds().height);
         sprite.setPosition(tile.x*TILE_SIZE, tile.y*TILE_SIZE);
         window.draw(sprite);
+    }
+}
+
+void Board::handleEvents(const sf::Event& event) {
+    if (event.type == sf::Event::MouseButtonPressed &&
+        event.mouseButton.button == sf::Mouse::Left) {
+        revealTile(event.mouseButton.x / TILE_SIZE, event.mouseButton.y / TILE_SIZE);
+    }
+
+    if (event.type == sf::Event::MouseButtonPressed &&
+        event.mouseButton.button == sf::Mouse::Right) {
+        placeFlag(event.mouseButton.x / TILE_SIZE, event.mouseButton.y / TILE_SIZE);    
     }
 }
