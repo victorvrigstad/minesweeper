@@ -18,6 +18,11 @@ MenuState::MenuState(unsigned width, unsigned height) {
 }
 
 void MenuState::handle_event(const sf::Event& event) {
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P) {
+        next_state = PATHFIND_STATE;
+        return;
+    }
+    
     if (event.type != sf::Event::MouseButtonPressed ||
         event.mouseButton.button != sf::Mouse::Left) {
         return;
@@ -36,6 +41,7 @@ void MenuState::handle_event(const sf::Event& event) {
         selected = Difficulty::Hard;
         next_state = GAME_STATE;
     }
+    
 }
 
 void MenuState::render(sf::RenderTarget& target) {

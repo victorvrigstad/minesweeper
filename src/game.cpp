@@ -2,6 +2,7 @@
 #include "constants.h"
 #include "menu_state.h"
 #include "game_state.h"
+#include "pathfinding_state.h"
 #include <iostream>
 
 
@@ -42,6 +43,20 @@ void Game::run() {
                 states[GAME_STATE] = std::make_unique<GameState>(d);
             }
         }
+        if (current_state == MENU_STATE && next == PATHFIND_STATE) {
+            constexpr unsigned COLS = 30, ROWS = 20, OBSTACLES = 120;
+            window.create(sf::VideoMode(COLS * TILE_SIZE, ROWS * TILE_SIZE), "Pathfinding");
+            window.setFramerateLimit(FPS);
+            states[PATHFIND_STATE] = std::make_unique<PathfindingState>(COLS, ROWS, OBSTACLES);
+        }
+
+        if (current_state == PATHFIND_STATE && next == MENU_STATE) {
+            states.erase(PATHFIND_STATE);
+            constexpr unsigned MENU_W = 800, MENU_H = 600;
+            window.create(sf::VideoMode(MENU_W, MENU_H), "Test");
+            window.setFramerateLimit(FPS);
+            states[MENU_STATE] = std::make_unique<MenuState>(MENU_W, MENU_H);
+        } 
             current_state = next;
         }
 

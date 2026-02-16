@@ -1,5 +1,5 @@
 #include "board.h"
-#include <random>
+#include "utils.h"
 
 Board::Board(unsigned width, unsigned height, unsigned bombCount)
     : width(width), height(height), bombCount(bombCount) {
@@ -11,11 +11,9 @@ Board::Board(unsigned width, unsigned height, unsigned bombCount)
         textures.push_back(tileTexture);
     }
 
-    for (unsigned y = 0; y < height; y++){
-        for (unsigned x = 0; x < width; x++){
-            tiles.push_back(Tile{x, y});
-        }
-    }
+    build_tiles<Tile>(width, height, tiles, [](unsigned x, unsigned y) {
+        return Tile{x, y};
+    });
 
     placeBombs(bombCount, width, height); 
     calculateAdjacency();
@@ -77,15 +75,8 @@ void Board::placeFlag(unsigned x, unsigned y) {
 }
 
 void Board::placeBombs(unsigned bombCount, unsigned width, unsigned height) {
-    static std::mt19937 rng(std::random_device{}());
-
-    std::uniform_int_distribution<unsigned> xDist(0, width - 1);
-    std::uniform_int_distribution<unsigned> yDist(0, height - 1);
-    
     for (unsigned i = 0; i < bombCount; i++) {
-        unsigned x = xDist(rng);
-        unsigned y = yDist(rng);
-        
+        auto [x, y] = random_coord(width, height);
         tileAt(x, y).state = 9;
     }
 }

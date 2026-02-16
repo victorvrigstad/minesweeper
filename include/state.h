@@ -3,9 +3,9 @@
 
 #include <SFML/Graphics.hpp>
 
-constexpr int MENU_STATE   = 0;
-constexpr int GAME_STATE   = 1;
-constexpr int HIDDEN_STATE = 2;
+constexpr int MENU_STATE     = 0;
+constexpr int GAME_STATE     = 1;
+constexpr int PATHFIND_STATE = 2;
 //constexpr int EXIT_STATE   = -1;
 
 enum class Difficulty {
