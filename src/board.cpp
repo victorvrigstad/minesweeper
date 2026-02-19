@@ -19,8 +19,7 @@ Board::Board(unsigned width, unsigned height, unsigned bombCount)
     calculateAdjacency();
 }
 
-void Board::revealTile(unsigned x, unsigned y) {
-    auto& t = tileAt(x, y);
+void Board::revealTile(Tile& t) {
     //std::this_thread::sleep_for(std::chrono::milliseconds(20)); TODO make it so not all tiles are revealed instantly, instead like wave
     if (!t.revealed && t.currState != 11) {
         if (t.state == 0) {
@@ -33,8 +32,8 @@ void Board::revealTile(unsigned x, unsigned y) {
                         continue;
                     }
 
-                    int nx = static_cast<int>(x) + dx;
-                    int ny = static_cast<int>(y) + dy;
+                    int nx = static_cast<int>(t.x) + dx;
+                    int ny = static_cast<int>(t.y) + dy;
 
                     if (nx < 0 || ny < 0 ||
                         nx >= static_cast<int>(width) ||
@@ -44,7 +43,7 @@ void Board::revealTile(unsigned x, unsigned y) {
 
                     auto& n = tileAt(static_cast<unsigned>(nx), static_cast<unsigned>(ny));
                     if (n.state < 9) {
-                        revealTile(static_cast<unsigned>(nx), static_cast<unsigned>(ny));
+                        revealTile(n);
                     }
                 }
             }
@@ -65,8 +64,7 @@ void Board::revealTile(unsigned x, unsigned y) {
     }
 }
 
-void Board::placeFlag(unsigned x, unsigned y) {
-    auto& t = tileAt(x, y);
+void Board::placeFlag(Tile& t) {
     if (t.currState == 11) {
         t.currState = 0;
     }
@@ -138,9 +136,10 @@ void Board::handleEvents(const sf::Event& event) {
         return;
     }
 
+    auto& clickedTile = tileAt(tx, ty);
     if (event.mouseButton.button == sf::Mouse::Left) {
-        revealTile(tx, ty);
+        revealTile(clickedTile);
     } else if (event.mouseButton.button == sf::Mouse::Right) {
-        placeFlag(tx, ty);
+        placeFlag(clickedTile);
     }
 }

@@ -11,5 +11,5 @@ public:
 
 private:
     int next_state = PATHFIND_STATE;
-    PathBoard board;
+    PathBoard pathBoard;
 };
