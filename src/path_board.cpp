@@ -6,7 +6,7 @@
  
 PathBoard::PathBoard(unsigned width, unsigned height, unsigned obstacleCount)
     : width(width), height(height) {
-    for (int i = 0; i <= 14; ++i) {
+    for (int i = 0; i <= 15; ++i) {
         if (!tileTexture.loadFromFile("resources/images/tile" + std::to_string(i) + ".png")) {
             throw std::runtime_error("Failed to load texture");
         }
@@ -50,7 +50,7 @@ void PathBoard::render(sf::RenderWindow& window) {
         } else if (tile.isPath) {
             drawState = 14;
         } else if (tile.visited) {
-            //drawState = 1;
+            drawState = 15;
         } else if (tile.isObstacle) {
             drawState = 10;
         }
@@ -89,6 +89,7 @@ void PathBoard::handleEvents(const sf::Event& event) {
     if (hasStart && hasEnd) {
         clearSearchState();
         bestFirstSearch(tileAt(startTile.x, startTile.y), tileAt(endTile.x, endTile.y));
+        //beginSearch();
     }
 }
 
@@ -181,4 +182,54 @@ bool PathBoard::bestFirstSearch(PathTile& currentTile, PathTile& endTile) {
         }
     }
     return false;
+}
+
+void PathBoard::beginSearch() {
+    clearSearchState();
+    stack.clear();
+    searchRunning = true;
+    searchFound = false;
+    
+    int s = static_cast<int>(startTile.y * width + startTile.x);
+    stack.push_back(s);
+}
+
+void PathBoard::stepDfs() {
+    if (!searchRunning) return;
+    if (stack.empty()) { searchRunning = false; return; }
+
+    int idx = stack.back();
+    stack.pop_back();
+
+    PathTile& current = tiles[idx];
+
+    if (current.visited || current.isObstacle) return;
+
+    current.visited = true;
+
+    if (current == endTile) {
+        searchRunning = false;
+        searchFound = true;
+        return;
+    }
+
+    static const std::array<std::pair<int,int>, 4> dirs = {{
+        {1, 0}, {-1, 0}, {0, 1}, {0, -1}
+    }};
+
+    for (const auto& [dx, dy] : dirs) {
+        int nx = static_cast<int>(current.x) + dx;
+        int ny = static_cast<int>(current.y) + dy;
+
+        if (nx < 0 || ny < 0 ||
+            nx >= static_cast<int>(width) ||
+            ny >= static_cast<int>(height)) {
+            continue;
+        }
+
+        PathTile& next = tileAt(static_cast<unsigned>(nx), static_cast<unsigned>(ny));
+        if (!next.visited && !next.isObstacle) {
+            stack.push_back(static_cast<int>(ny * static_cast<int>(width) + nx));
+        }
+    }
 }

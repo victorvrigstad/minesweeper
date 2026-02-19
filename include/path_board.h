@@ -26,6 +26,7 @@ public:
     PathBoard(unsigned width, unsigned height, unsigned obstacleCount);
     void render(sf::RenderWindow& window);
     void handleEvents(const sf::Event& event);
+    void stepDfs();
 
 private:
     void generateObstacles(unsigned obstacleCount);
@@ -36,6 +37,9 @@ private:
     
     bool depthFirstSearch(PathTile& startTile, PathTile& endTile);
     bool bestFirstSearch(PathTile& startTile, PathTile& endtile);
+    
+    
+    void beginSearch();
     void clearSearchState();
 
     unsigned width;
@@ -45,6 +49,9 @@ private:
     bool hasStart = false;
     bool hasEnd = false;
     std::vector<PathTile> tiles;
+    bool searchRunning = false;
+    bool searchFound = false;
+    std::vector<int> stack;
     
     sf::Texture tileTexture;
     std::vector<sf::Texture> textures;

@@ -13,7 +13,10 @@ void PathfindingState::handle_event(const sf::Event& event) {
 
 void PathfindingState::render(sf::RenderTarget& target) {
     auto* window = dynamic_cast<sf::RenderWindow*>(&target);
-    if (window) pathBoard.render(*window);
+    if (!window) return;
+    
+    //pathBoard.stepDfs();
+    pathBoard.render(*window);
 }
 
 int PathfindingState::get_next_state() {
